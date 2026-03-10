@@ -1,0 +1,22 @@
+   Ferruccio Busoni's Piano Concerto is an hour-long marathon
+spread over 5 movements, the finale including a chorus singing
+a German translation of Lebanese poetry (!)
+
+   Since so many instruments are required I have used, in addition
+to my usual Proteus 2, a Korg O3R/W for additional instruments,
+and a Korg P3 piano module.
+
+   All transposing instruments have been transposed to C. Since
+the Proteus 2 automatically transposes piccolos up an octave
+and basses down an octave, I have done this (so if you're
+using a Proteus 2, you'll have to transpose them back again).
+
+   FYI, I've already sequenced the 3rd and 4th movements. If
+not on this site, they have been uploaded elsewhere.
+
+
+                  --Gary Goldberg
+
+            National Capital Amiga Users Group
+
+  Internet: GaryG@ix.netcom.com    Compuserve: 76236,3302

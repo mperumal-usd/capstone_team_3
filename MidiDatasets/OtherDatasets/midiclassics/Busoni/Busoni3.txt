@@ -1,0 +1,15 @@
+      This is a sequence of the 3rd movement of Ferrucio
+Busoni's mammoth 5-movement, hour-long Piano Concerto.
+For it, I have used a Proteus 2, plus a Korg O3R/W for
+a few tracks and a Korg P3 piano module.
+
+   Notes: There is some channel sharing; in addition,
+there are program changes within string tracks which
+share channels; there are also some pizzicato bass notes
+in the pizzicato violas track from bars 98-101.
+
+                     - Gary Goldberg
+
+              National Capital Amiga Users Group
+
+                        garyg@ix.netcom.com

@@ -1,0 +1,15 @@
+   This is a sequence of the 1st movement of Ferrucio Busoni's
+mammoth 5-movement Piano Concerto. I have sequenced it for
+the Proteus 2 orchestral sound module and the Korg P3 piano
+module.
+
+   All tracks are at concert pitch. Please note that there
+are program changes in the French Horn track (in order to
+use the Proteus' Horn Section, mf Horn, and ff Horn programs,
+respectively 38, 36, and 37).
+
+                  Gary Goldberg
+
+          National Capital Amiga Users Group
+
+               garyg@ix.netcom.com

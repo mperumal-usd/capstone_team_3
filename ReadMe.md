@@ -557,21 +557,32 @@ mindmap
 gantt
     title Project Implementation Timeline
     dateFormat YYYY-MM-DD
+    section Project Research
+    Literature Review:src1, 2026-03-06, 4d
+    Methodology Definition:src2, after src1, 1d
     section Setup
-    Install dependencies           :setup1, 2026-03-06, 1d
-    Clone & install MusicBERT     :setup2, after setup1, 1d
-    Download pretrained weights    :setup3, after setup2, 1d
+    Research & install dependencies:setup1, after src2, 1d
+    Clone & install MusicBERT:setup2, after setup1, 1d
+    Download Pretrained weights:setup3, after setup2, 1d
+    section Prepare MIDI dataset
+    Identify corrupt MIDI files:prep1, after setup3, 1d
+    Identify known melodies and explore getting/generating multiple versions of the same melody:prep2, after prep1, 2d
+    Generate MIDI versions from Audio recordings using the BasicPitch library from Spotify:prep3, after prep2, 2d
     section Core Development
-    Implement MIDI preprocessing   :dev1, after setup3, 2d
-    Implement embedding generation :dev2, after dev1, 2d
-    Implement similarity compute   :dev3, after dev2, 1d
+    Implement MIDI preprocessing:dev1, after prep3, 2d
+    implement embedding generation:dev2, after dev1, 2d
+    Implement similarity compute:dev3, after dev2, 2d
     section Advanced Features
-    Batch processing system        :adv1, after dev3, 2d
-    FAISS integration             :adv2, after adv1, 2d
-    Sliding window detection       :adv3, after adv2, 2d
-    section Testing & Deployment
-    Testing & validation           :test, after adv3, 3d
-    Optimization & deployment      :deploy, after test, 2d
+    Batch processing system:adv1, after dev3, 2d
+    FAISS Integration:adv2, after adv1, 3d
+    Sliding window detection:adv3, after adv2, 2d
+    section Testing & Validation
+    Testing with multiple versions of MIDI and AUDIO files:test1, after adv3, 7d
+    Optimization & Fine-tuning:test2, after test1, 3d
+    section Results
+    Preparing Project Report:res1, after test2, 5d
+    Preparing GitHub Repository:res2, after test2, 5d
+    Preparing Project Presentation:res3, after test2, 5d
 ```
 
 ---

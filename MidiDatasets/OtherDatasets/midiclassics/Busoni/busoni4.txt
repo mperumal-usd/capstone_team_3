@@ -1,0 +1,37 @@
+   Ferrucio Busoni's mammoth Piano Concerto is spread over 5
+movements (with a male chorus in the finale!), taking about
+an hour to perform.  This is the 4th movement, a Tarantella
+("All' Italiana").
+
+   The sequence was done for a Proteus 2 (the orchestral
+instruments) and a Korg P3 piano module. The .mid file
+has transposed the basses track down an octave and the
+piccolo track up an octave, since these instruments sound,
+respecively, an octave lower and higher than written.
+The Proteus 2 allows for this, but most sound modules don't.
+The A Clarinets and French Horns have also been transposed to
+concert pitch.
+
+   To keep the orchestral tracks down to 16 channels, I've
+had to do a lot of program changes in the Tremolo Strings
+track. They're annotated in the Comments part of the track,
+but not all sequencers display this information, so I've
+given it below:
+
+Instrument                  Bars:
+
+Pizzicato Violins           286-291; 739-742
+
+Glockenspiel                296-308; 614-619
+
+Pizzicato Cellos            353-365
+
+Pizzicato Violas & Cellos   383-395
+
+back to Tremolo Strings     520-577
+
+   Snare Drums: single hits are a C; rolls are an A.
+
+               --Gary Goldberg
+
+              GaryG@ix.netcom.com
