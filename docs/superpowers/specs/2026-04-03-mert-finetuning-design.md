@@ -1,32 +1,33 @@
-# MERT Fine-Tuning Design Spec
-**Date:** 2026-04-03  
-**Task:** Fine-tune MERT-v1-95M on the composer triplet dataset with Drive-backed checkpointing
+# MERT Fine-Tuning Design Spec (LoRA)
+**Date:** 2026-04-03 (revised)
+**Task:** Fine-tune MERT-v1-95M with LoRA on the composer triplet WAV dataset, Drive-backed checkpointing
 
 ---
 
 ## Overview
 
-Fine-tune `m-a-p/MERT-v1-95M` for composer-similarity retrieval using the existing 22,458-triplet
-(anchor, positive, negative) WAV dataset. The backbone is frozen; only a small projection head is
-trained. Every preprocessing stage saves its output to Google Drive so a disconnected Colab session
-can resume from the last completed step.
+Fine-tune `m-a-p/MERT-v1-95M` for composer-similarity retrieval using LoRA adapters injected
+into all attention projections (q, k, v, o) of each transformer layer. No projection head —
+the mean-pooled, L2-normalized 768-dim MERT output is used directly for triplet loss.
+Because LoRA weights change during training, embeddings cannot be pre-cached; WAV files are
+loaded and forwarded on every training batch. Every preprocessing stage and an intra-epoch
+step checkpoint are saved to Google Drive for disconnect-safe resumption.
 
 ---
 
 ## Model Architecture
 
 ```
-MERT-v1-95M (all weights frozen)
-    → mean-pool over time axis → 768-dim embedding
-    → ProjectionHead:
-        Linear(768 → 256) → ReLU → Dropout(0.3)
-        → Linear(256 → 128)
-    → L2-normalize → 128-dim unit-sphere embedding
+MERT-v1-95M
+  + LoRA adapters on q_proj, k_proj, v_proj, o_proj (all transformer layers)
+    LoRA rank r=8, alpha=16, dropout=0.05
+  → mean-pool last_hidden_state → 768-dim
+  → L2-normalize → 768-dim unit-sphere embedding
 
-Loss: TripletMarginLoss(margin=0.3) with semi-hard negative mining
+Loss: TripletMarginLoss(margin=0.3, p=2)
 ```
 
-Trainable parameters: projection head only (~200K params vs. 95M frozen).
+Trainable parameters: LoRA adapters only (~3–5M out of 95M total).
 
 ---
 
@@ -36,13 +37,17 @@ Trainable parameters: projection head only (~200K params vs. 95M frozen).
 |-----|-------|
 | MERT model | `m-a-p/MERT-v1-95M` |
 | Sample rate | 24000 Hz |
-| Embedding dim | 128 |
+| Embedding dim | 768 (direct MERT output, no head) |
+| LoRA rank | 8 |
+| LoRA alpha | 16 |
+| LoRA dropout | 0.05 |
+| LoRA target modules | `q_proj`, `k_proj`, `v_proj`, `o_proj` |
 | Triplet margin | 0.3 |
-| Batch size (training) | 256 (embeddings pre-computed) |
-| Batch size (MERT embed) | 16 (GPU memory constraint) |
-| Learning rate | 1e-3 |
-| Scheduler | StepLR(step=5, gamma=0.5) |
-| Epochs | 20 |
+| Batch size | 8 (each triplet = 3 WAV forward passes) |
+| Learning rate | 5e-5 |
+| Scheduler | CosineAnnealingLR (T_max = total steps) |
+| Epochs | 10 |
+| Save every N steps | 200 |
 | Drive base | `/content/drive/MyDrive/AAI-590 Capstone/MERT_Finetune/` |
 | ChunkSamples | `/content/drive/MyDrive/AAI-590 Capstone/ChunkSamples/` |
 
@@ -50,57 +55,53 @@ Trainable parameters: projection head only (~200K params vs. 95M frozen).
 
 ## Notebook Sections & Drive Checkpoints
 
-Each section checks whether its checkpoint file already exists on Drive before running.
-If the file exists, it loads and skips. If not, it runs the full computation and saves immediately.
+Each section checks whether its checkpoint already exists on Drive before running.
 
 | # | Section | Computation | Drive output |
 |---|---------|-------------|--------------|
-| 0 | Setup | Mount Drive, install deps, define config | — |
-| 1 | Triplet CSV | Regenerate (anchor, pos, neg) DataFrame from ChunkSamples directory | `triplet_df.csv` |
-| 2 | Embed Anchors | MERT-embed all anchor WAVs in batches of 16; save every 500 rows for sub-step resume | `embeddings/anchor_embeddings.npy`, `embeddings/anchor_index.json` |
-| 3 | Embed Positives | Same, for positive WAVs | `embeddings/positive_embeddings.npy` |
-| 4 | Embed Negatives | Same, for negative WAVs | `embeddings/negative_embeddings.npy` |
-| 5 | Train/Val Split | 80/20 stratified split on anchor song identity | `splits/train_idx.npy`, `splits/val_idx.npy` |
-| 6 | Training | ProjectionHead + TripletLoss loop; best model saved when val loss improves | `checkpoints/best_model.pt`, `checkpoints/last_model.pt`, `training_log.csv` |
-| 7 | Evaluation | Cosine-sim positive vs. negative score distributions; compare to MERT baseline scores | `results/eval_results.csv`, `results/score_plot.png` |
+| 0 | Setup | Mount Drive, install deps (`peft` + others), define config | — |
+| 1 | Triplet CSV | Regenerate (anchor, pos, neg) + composer/song columns | `triplet_df.csv` |
+| 2 | Train/Val Split | 80/20 stratified on composer; skips if files exist | `splits/train_idx.npy`, `splits/val_idx.npy` |
+| 3 | Training | LoRA fine-tune; saves adapter every SAVE_STEPS; resumes from last checkpoint | `checkpoints/lora_last/`, `checkpoints/lora_best/`, `checkpoints/optimizer_state.pt`, `checkpoints/training_state.json`, `training_log.csv` |
+| 4 | Evaluation | Load best LoRA adapter; compute pos/neg cosine sims on val set; plot | `results/eval_results.csv`, `results/score_plot.png` |
 
-### Sub-step resume for embedding (Sections 2–4)
+### Intra-epoch resume (Section 3)
 
-Embedding 22,458 WAVs takes ~6 hours. The notebook saves partial progress every 500 rows
-as a `.npy` partial file. On resume, it reads how many rows are already embedded and picks up
-from that index. Full file is written atomically only when all rows are done.
+`training_state.json` stores `{epoch, step, best_val_loss}`. On resume the training loop
+skips batches up to the saved step within the current epoch, then continues normally.
+The LoRA adapter and optimizer state are restored from Drive before resuming.
 
 ---
 
 ## Training Loop Detail
 
 ```
+Build TripletWAVDataset (filenames only; loads WAV on __getitem__)
+DataLoader(batch_size=8, shuffle=True)
+
 For each epoch:
-    For each batch of (anchor_emb, pos_emb, neg_emb):
-        project(anchor_emb) → a_proj
-        project(pos_emb)    → p_proj
-        project(neg_emb)    → n_proj
-        loss = TripletMarginLoss(a_proj, p_proj, n_proj)
-        loss.backward()
-        optimizer.step()
+    For each batch of (anchor_wav, pos_wav, neg_wav):
+        Forward all three through MERT+LoRA
+        Mean-pool → L2-normalize → 768-dim embeddings
+        loss = TripletMarginLoss(a_emb, p_emb, n_emb)
+        loss.backward(); optimizer.step(); scheduler.step()
+        If step % SAVE_STEPS == 0:
+            Save lora_last adapter + optimizer_state.pt + training_state.json
 
-    Compute val loss on held-out 20%
+    Compute val loss (no grad) on val set
     If val_loss < best_val_loss:
-        save best_model.pt to Drive
-    save last_model.pt to Drive (always, for crash recovery)
-    append row to training_log.csv
+        Save lora_best adapter
+    Append row to training_log.csv
 ```
-
-**Best model criterion:** minimum validation triplet loss.
 
 ---
 
 ## Evaluation Metrics
 
-- Mean positive cosine similarity (fine-tuned head vs. raw MERT baseline)
-- Mean negative cosine similarity
+- Mean positive cosine similarity on val set (fine-tuned LoRA model)
+- Mean negative cosine similarity on val set
 - Separation gap = mean(pos_sim) − mean(neg_sim)
-- Distribution plot saved to Drive
+- 2-panel histogram: positive vs negative distributions, saved to Drive
 
 ---
 
@@ -110,17 +111,18 @@ For each epoch:
 AAI-590 Capstone/
 └── MERT_Finetune/
     ├── triplet_df.csv
-    ├── embeddings/
-    │   ├── anchor_embeddings.npy
-    │   ├── anchor_index.json
-    │   ├── positive_embeddings.npy
-    │   └── negative_embeddings.npy
     ├── splits/
     │   ├── train_idx.npy
     │   └── val_idx.npy
     ├── checkpoints/
-    │   ├── best_model.pt
-    │   └── last_model.pt
+    │   ├── lora_best/              ← best adapter weights
+    │   │   ├── adapter_config.json
+    │   │   └── adapter_model.safetensors
+    │   ├── lora_last/              ← latest adapter for resume
+    │   │   ├── adapter_config.json
+    │   │   └── adapter_model.safetensors
+    │   ├── optimizer_state.pt
+    │   └── training_state.json     ← {epoch, step, best_val_loss}
     ├── training_log.csv
     └── results/
         ├── eval_results.csv
@@ -131,7 +133,8 @@ AAI-590 Capstone/
 
 ## Constraints & Assumptions
 
-- Colab GPU: T4 (16 GB VRAM). MERT-v1-95M at sr=24000, batch=16 fits comfortably.
-- ChunkSamples WAV files are all accessible via the file lookup dictionary (filename → full path).
-- The triplet CSV is regenerated from scratch (user preference) each run of Section 1.
-- All random seeds are fixed (seed=42) for reproducibility of train/val split.
+- Colab GPU: T4 (16 GB VRAM). MERT-v1-95M + LoRA at batch_size=8 fits within memory.
+- ChunkSamples WAV filenames are globally unique (composer+song prefix in filename).
+- Triplet CSV is regenerated from scratch each run (Section 1 always runs).
+- All random seeds fixed (seed=42) for reproducibility.
+- `peft` library from Hugging Face used for LoRA injection.
