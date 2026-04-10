@@ -30,7 +30,7 @@ sidebar_label: Team
 
 ---
 
-### Israel Lennon
+### Israel Romero
 
 **Role:** Data Pipeline · Feature Engineering · Project Timeline
 

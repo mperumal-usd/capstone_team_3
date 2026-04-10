@@ -13,7 +13,7 @@ sidebar_label: Project Overview
       AAI-590 Applied AI Capstone · University of San Diego · Spring 2026 · Team 3
     </p>
     <p style={{color: 'rgba(255,255,255,0.7)', margin: '0.25rem 0 0', fontSize: '0.9rem'}}>
-      Manikandan Perumal · Darin Verduzco · Israel Lennon
+      Manikandan Perumal · Darin Verduzco · Israel Romero
     </p>
   </div>
 </div>
