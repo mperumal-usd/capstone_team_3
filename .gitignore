@@ -1,2 +1,5 @@
 /.ipynb_checkpoints
 /muzic
+website/build/
+website/node_modules/
+website/.docusaurus/

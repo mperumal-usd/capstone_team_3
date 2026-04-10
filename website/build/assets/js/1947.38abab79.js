@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkmelody_match_docs=self.webpackChunkmelody_match_docs||[]).push([[1947],{1947:(e,c,s)=>{s.d(c,{createWardleyServices:()=>a.J});var a=s(2295);s(2519)}}]);
