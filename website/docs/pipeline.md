@@ -6,7 +6,7 @@ sidebar_label: Data Pipeline
 
 # Data Pipeline
 
-The pipeline transforms raw MIDI files into a searchable embedding index through six stages.
+The pipeline transforms raw MIDI files into a searchable embedding index through six stages. All statistics below are taken directly from `COLAB_MERT_Finetune_v5.ipynb` outputs.
 
 ```mermaid
 flowchart LR
@@ -27,10 +27,10 @@ flowchart LR
 
 ## Stage 1 — Dataset Collection
 
-The primary corpus is **590 classical piano MIDI files** spanning major Western composers. Files were sourced, validated, and deduplicated before processing.
+590 classical piano MIDI files spanning ~30 composers.
 
 ```mermaid
-pie title Composers in Dataset (sample)
+pie title Approximate Composer Distribution (590 files)
     "Bach" : 18
     "Beethoven" : 22
     "Chopin" : 25
@@ -50,13 +50,7 @@ pie title Composers in Dataset (sample)
 
 ## Stage 2 — MIDI → WAV Synthesis
 
-MIDI files are purely symbolic (note events + timing). To feed them into an audio model, each MIDI is synthesized to WAV using **FluidSynth** with the FluidR3 GM soundfont.
-
-```bash
-fluidsynth -ni FluidR3_GM.sf2 input.mid -F output.wav -r 44100
-```
-
-The resulting WAV is resampled to **24 kHz mono** using `librosa` — matching MERT's expected input sample rate.
+MIDI files are synthesised to WAV using **FluidSynth** with the FluidR3 GM soundfont, then resampled to **24 kHz mono** to match MERT's expected input.
 
 ```mermaid
 sequenceDiagram
@@ -66,136 +60,135 @@ sequenceDiagram
     participant W as WAV Chunk
 
     M->>F: symbolic note events
-    F->>F: render with FluidR3_GM.sf2 soundfont
+    F->>F: render with FluidR3_GM.sf2
     F->>L: 44,100 Hz stereo WAV
     L->>L: resample → 24,000 Hz mono
-    L->>W: audio array (float32)
+    L->>W: float32 audio array
+```
+
+```bash
+fluidsynth -ni FluidR3_GM.sf2 input.mid -F output.wav -r 44100
 ```
 
 ---
 
 ## Stage 3 — Chunking
 
-Long audio files are split into **fixed 7-second, non-overlapping chunks**. Each chunk becomes an independent retrieval unit in the index.
+Each WAV is split into **fixed 7-second non-overlapping chunks** — the retrieval unit for FAISS.
 
-```python
-CHUNK_LENGTH_SEC = 7
-CHUNK_SAMPLES    = 24000 * 7   # 168,000 samples per chunk
-
-for i in range(num_chunks):
-    start = i * CHUNK_SAMPLES
-    chunk = audio[start : start + CHUNK_SAMPLES]
-    soundfile.write(f"{song}_chunk_{i+1}.wav", chunk, 24000)
+```mermaid
+xychart-beta
+    title "Dataset Scale after Chunking"
+    x-axis ["Gallery Chunks", "Train Triplets", "Val Triplets", "Test Chunks"]
+    y-axis "Count (thousands)" 0 --> 50
+    bar [43.663, 18.546, 4.637, 4.116]
 ```
 
-**Dataset statistics after chunking:**
+**Actual notebook output:**
+```
+File lookup built: 43663 files
+Total triplets:    23183
+Train: 18546  Val: 4637   (80/20 stratified by composer)
+Test chunks: 4116
+```
 
 | Metric | Value |
 |--------|-------|
 | Total WAV chunks (gallery) | **43,663** |
-| Test set chunks | 4,116 |
-| Train triplets | 18,546 |
-| Val triplets | 4,637 |
+| Total triplets generated | **23,183** |
+| Train split | 18,546 (80%) |
+| Val split | 4,637 (20%) |
+| External test chunks | 4,116 |
 | Chunk duration | 7 seconds |
-| Sample rate | 24 kHz |
-| Total unique composers | ~30 |
+| Sample rate | 24,000 Hz |
 
 ---
 
-## Stage 4 — Embedding Generation
+## Stage 4 — Model Setup
 
-Each 7-second chunk is passed through **MERT-v1-95M** (fine-tuned with LoRA) to produce a fixed-size vector representation.
+**Trainable parameters from notebook output:**
+
+```
+trainable params: 442,368 || all params: 94,814,080 || trainable%: 0.4666
+CNN projection head: 3,296,768 params  (filters=256, kernels=(3, 5, 7), embed=128)
+Train batches: 2319  Val batches: 580
+Total training steps: 23190
+```
 
 ```mermaid
 graph TD
-    A["WAV chunk\n168,000 samples"] --> B["AutoProcessor\nfeature extraction"]
-    B --> C["MERT Encoder\n12 transformer layers\n768-dim hidden states"]
-    C --> D["last_hidden_state\nB × T × 768"]
-    D --> E["CNN Projection Head\nmulti-scale temporal aggregation"]
-    E --> F["128-dim embedding\nL2-normalized"]
+    A["WAV chunk · 168,000 samples"] --> B["AutoProcessor\nfeature extraction"]
+    B --> C["MERT-v1-95M\n12 transformer layers\n768-dim hidden states\n94.8M total params"]
+    C --> D["LoRA adapters\nq/k/v/o projections\nr=8 · α=16\n442K trainable params (0.47%)"]
+    D --> E["CNN Projection Head\nConv1d × 3 (k=3,5,7)\n3.3M params\n→ 128-dim L2-norm"]
 
     style A fill:#e3f2fd,stroke:#1565c0
     style C fill:#f3e5f5,stroke:#6a1b9a
-    style E fill:#fff8e1,stroke:#f57f17
-    style F fill:#e8f5e9,stroke:#2e7d32
-```
-
-The **CNN Projection Head** replaces naive mean-pooling with learned multi-scale temporal aggregation:
-
-```python
-class CNNProjectionHead(nn.Module):
-    def __init__(self):
-        self.convs = nn.ModuleList([
-            nn.Conv1d(768, 256, kernel_size=k, padding=k//2)
-            for k in (3, 5, 7)          # local / mid / broad patterns
-        ])
-        self.proj = nn.Sequential(
-            nn.Linear(256 * 3, 384),
-            nn.LayerNorm(384),
-            nn.GELU(),
-            nn.Linear(384, 128),
-        )
-
-    def forward(self, hidden_states):
-        x = hidden_states.transpose(1, 2)           # (B, 768, T)
-        pooled = [conv(x).mean(dim=2) for conv in self.convs]
-        return F.normalize(self.proj(torch.cat(pooled, dim=1)), dim=1)
+    style D fill:#fff8e1,stroke:#f57f17
+    style E fill:#e8f5e9,stroke:#2e7d32
 ```
 
 ---
 
-## Stage 5 — Triplet Construction for Training
+## Stage 5 — Triplet Training
 
-The model is fine-tuned using **triplet loss**. Each training example is a triple `(anchor, positive, negative)`:
+Each training example is a `(anchor, positive, negative)` triple:
 
 ```mermaid
 graph LR
-    subgraph same_song["Same Song (Bach 847)"]
+    subgraph same_song["Same Song (e.g. bach_847)"]
         A["Anchor\nbash_847_chunk_1.wav"]
         P["Positive\nbach_847_chunk_3.wav"]
     end
-    subgraph diff_composer["Different Composer (Liszt)"]
-        N["Negative\nislam_chunk_2.wav"]
+    subgraph diff_composer["Different Composer (e.g. Liszt)"]
+        N["Negative\nislam_chunk_1.wav"]
     end
-    A -->|"pull together ↓ distance"| P
-    A -->|"push apart ↑ distance"| N
+    A -->|"↓ pull together"| P
+    A -->|"↑ push apart"| N
 
     style same_song fill:#e8f5e9,stroke:#2e7d32
     style diff_composer fill:#ffebee,stroke:#c62828
 ```
 
+**Actual triplet sample from notebook:**
+
 ```
-Loss = max(0,  d(anchor, positive) − d(anchor, negative) + 0.3)
+anchor               positive              negative              composer  song
+bach_847_chunk_1.wav bach_847_chunk_2.wav  islamei_chunk_1.wav   bach      bach_847
+bach_847_chunk_1.wav bach_847_chunk_3.wav  islamei_chunk_2.wav   bach      bach_847
 ```
 
-Total triplets generated: **23,183** · Train: 18,546 (80%) · Val: 4,637 (20%)
+Loss: `TripletMarginLoss(margin=0.3)`
 
 ---
 
-## Stage 6 — FAISS Indexing
+## Stage 6 — Embedding Extraction & FAISS Index
 
-After embedding the full gallery, all 128-dim vectors are loaded into a **FAISS IndexFlatL2** for exact nearest-neighbour search.
+After training, all 43,663 chunks are embedded with the best checkpoint (epoch 9):
 
-```python
-import faiss, numpy as np
-
-d     = 128
-index = faiss.IndexFlatL2(d)
-index.add(gallery_embeddings.astype('float32'))   # 34,930 vectors
-
-# Query: find top-10 matches for a new chunk
-D, I = index.search(query_embedding, k=10)
-# cosine_similarity = 1 - (L2_distance / 2)  — valid for L2-normalised embeddings
+```
+Extracting all embeddings: 100%|██████████| 5458/5458 [35:09<00:00, 2.59s/it]
+Saved 43663 embeddings → all_embeddings.pkl
+FAISS index built. Total vectors indexed: 34930
 ```
 
 ```mermaid
 graph LR
-    Q["Query chunk\n(test audio)"] --> QE["MERT + LoRA\nEmbedding"]
-    QE --> FS["FAISS search\nTop-K nearest"]
-    DB[("Gallery Index\n34,930 × 128")] --> FS
-    FS --> R["Top-K results\nwith similarity scores"]
+    Q["Query chunk\n(7-sec WAV)"] --> QE["MERT + LoRA\n+ CNN Head\n128-dim embedding"]
+    QE --> FS["FAISS IndexFlatL2\nsearch top-K"]
+    DB[("Gallery Index\n34,930 × 128-dim\nL2-normalised")] --> FS
+    FS --> R["Top-K results\nwith similarity scores\ncosine_sim = 1 − L2²/2"]
 
     style Q fill:#e3f2fd,stroke:#1565c0
     style DB fill:#f3e5f5,stroke:#6a1b9a
     style R fill:#e8f5e9,stroke:#2e7d32
+```
+
+**Sample FAISS search output:**
+```
+Query: Aragon (Fantasia) Op.47 part 6_chunk_1.wav
+  Rank 1: alb_se6_chunk_41.wav   sim=0.9710  ✓ correct
+  Rank 2: alb_se6_chunk_6.wav    sim=0.9618  ✓ correct
+  Rank 3: alb_se6_chunk_39.wav   sim=0.9608  ✓ correct
+  Rank 4: alb_se6_chunk_40.wav   sim=0.9581  ✓ correct
 ```
