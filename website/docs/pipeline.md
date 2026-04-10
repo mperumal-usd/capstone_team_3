@@ -30,7 +30,7 @@ flowchart LR
 590 classical piano MIDI files spanning ~30 composers.
 
 ```mermaid
-pie title MIDI File Count by Composer (292 files in repo)
+pie title MIDI File Count by Composer (295 files)
     "Chopin" : 48
     "Schubert" : 29
     "Beethoven" : 29
@@ -39,7 +39,7 @@ pie title MIDI File Count by Composer (292 files in repo)
     "Haydn" : 21
     "Liszt" : 16
     "Grieg" : 16
-    "Others (11 composers)" : 88
+    "Others (11 composers)" : 91
 ```
 
 **Data cleaning steps:**
