@@ -18,20 +18,12 @@ sidebar_label: Team
 
 ### Manikandan Perumal
 
-**Role:** Model Architecture · MERT Fine-Tuning · FAISS Integration · Infrastructure
-
-Manikandan led the design and implementation of the core similarity pipeline. He developed all five iterations of the MERT fine-tuning notebooks, the CNN projection head architecture, and the FAISS-based retrieval system. He also built the preprocessing pipeline for MIDI-to-WAV conversion and audio chunking.
-
 - GitHub: [@mperumal-usd](https://github.com/mperumal-usd)
 - University of San Diego, Applied AI Program
 
 ---
 
 ### Darin Verduzco
-
-**Role:** Data Collection · Baseline Models · Evaluation
-
-Darin contributed to dataset curation, corpus cleaning, and the evaluation framework. He implemented and benchmarked the baseline deep learning models (LSTM, GRU, Siamese CNN, Transformer) that establish the performance comparison context for the MERT approach.
 
 - GitHub: [@caliskate](https://github.com/caliskate)
 - University of San Diego, Applied AI Program
@@ -41,8 +33,6 @@ Darin contributed to dataset curation, corpus cleaning, and the evaluation frame
 ### Israel Lennon
 
 **Role:** Data Pipeline · Feature Engineering · Project Timeline
-
-Israel worked on the data preparation pipeline, feature engineering exploration, and project coordination. He contributed to the early-stage EDA notebooks and the methodology definition that shaped the overall research direction.
 
 - GitHub: [@isralennon](https://github.com/isralennon)
 - University of San Diego, Applied AI Program
