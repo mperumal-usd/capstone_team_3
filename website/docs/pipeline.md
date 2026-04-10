@@ -30,15 +30,16 @@ flowchart LR
 590 classical piano MIDI files spanning ~30 composers.
 
 ```mermaid
-pie title Approximate Composer Distribution (590 files)
-    "Bach" : 18
-    "Beethoven" : 22
-    "Chopin" : 25
-    "Mozart" : 20
-    "Schubert" : 15
-    "Liszt" : 12
-    "Grieg" : 10
-    "Others" : 38
+pie title MIDI File Count by Composer (292 files in repo)
+    "Chopin" : 48
+    "Schubert" : 29
+    "Beethoven" : 29
+    "Schumann" : 24
+    "Mozart" : 21
+    "Haydn" : 21
+    "Liszt" : 16
+    "Grieg" : 16
+    "Others (11 composers)" : 88
 ```
 
 **Data cleaning steps:**
