@@ -57,11 +57,11 @@ const config = {
         theme: { light: 'neutral', dark: 'dark' },
       },
       navbar: {
-        title: 'Melody Match',
+        title: '',
         logo: {
-          alt: 'University of San Diego',
+          alt: 'University of San Diego — Melody Match',
           src: 'img/logo-usd.png',
-          style: { filter: 'brightness(0) invert(1)' },   // white on dark navbar
+          style: { height: '36px', filter: 'brightness(0) invert(1)' },
         },
         items: [
           { to: '/', label: 'Overview', position: 'left' },
