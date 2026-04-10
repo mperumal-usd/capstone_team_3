@@ -20,8 +20,6 @@ Visualize and play any MIDI file. Renders a real-time piano roll, shows note sta
 - Note density and pitch range stats
 - Playback controls (play / pause / stop)
 
-import BrowserWindow from '@site/src/components/BrowserWindow';
-
 <div style={{border: '1px solid var(--ifm-color-emphasis-300)', borderRadius: '12px', overflow: 'hidden', marginBottom: '2rem'}}>
   <div style={{background: 'var(--ifm-color-emphasis-100)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--ifm-color-emphasis-600)'}}>
     <span style={{width: 12, height: 12, borderRadius: '50%', background: '#ef4444', display: 'inline-block'}}></span>
