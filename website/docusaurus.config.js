@@ -35,6 +35,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/',
+          breadcrumbs: false,
         },
         blog: false,
         theme: {
@@ -61,7 +62,7 @@ const config = {
         logo: {
           alt: 'University of San Diego — Melody Match',
           src: 'img/logo-usd.png',
-          style: { height: '36px', filter: 'brightness(0) invert(1)' },
+          style: { height: '22px' },
         },
         items: [
           { to: '/', label: 'Overview', position: 'left' },

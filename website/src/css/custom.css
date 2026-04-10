@@ -1,13 +1,19 @@
 :root {
-  --ifm-color-primary: #7c3aed;
-  --ifm-color-primary-dark: #6d28d9;
-  --ifm-color-primary-darker: #5b21b6;
-  --ifm-color-primary-darkest: #4c1d95;
-  --ifm-color-primary-light: #8b5cf6;
-  --ifm-color-primary-lighter: #a78bfa;
-  --ifm-color-primary-lightest: #c4b5fd;
+  --ifm-font-size-base: 14px;
+  --ifm-font-weight-base: 300;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-font-weight: 500;
+  --ifm-color-primary: #6d28d9;
+  --ifm-color-primary-dark: #5b21b6;
+  --ifm-color-primary-darker: #4c1d95;
+  --ifm-color-primary-darkest: #3b0764;
+  --ifm-color-primary-light: #7c3aed;
+  --ifm-color-primary-lighter: #8b5cf6;
+  --ifm-color-primary-lightest: #a78bfa;
   --ifm-code-font-size: 90%;
-  --docusaurus-highlighted-code-line-bg: rgba(124, 58, 237, 0.1);
+  --ifm-navbar-shadow: 0 1px 0 0 rgba(0,0,0,0.07), 0 4px 24px rgba(109,40,217,0.06);
+  --ifm-global-radius: 10px;
+  --docusaurus-highlighted-code-line-bg: rgba(109, 40, 217, 0.08);
 }
 
 [data-theme='dark'] {
@@ -18,85 +24,149 @@
   --ifm-color-primary-light: #c4b5fd;
   --ifm-color-primary-lighter: #ddd6fe;
   --ifm-color-primary-lightest: #ede9fe;
-  --docusaurus-highlighted-code-line-bg: rgba(167, 139, 250, 0.15);
+  --ifm-background-color: #0f0f13;
+  --ifm-background-surface-color: #18181f;
+  --ifm-navbar-background-color: #13131a;
+  --ifm-navbar-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.4);
+  --docusaurus-highlighted-code-line-bg: rgba(167, 139, 250, 0.12);
 }
 
-/* Hero banner */
-.hero--primary {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 100%);
+/* ── Navbar ──────────────────────────────────────────────── */
+.navbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(109, 40, 217, 0.1);
 }
 
-/* Metric cards */
-.metric-card {
-  background: var(--ifm-card-background-color);
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 12px;
-  padding: 1.5rem;
-  text-align: center;
-  margin-bottom: 1rem;
+.navbar__link {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
-.metric-value {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--ifm-color-primary);
-  line-height: 1;
+.navbar__link--active {
+  font-weight: 500;
 }
 
-.metric-label {
-  font-size: 0.85rem;
+/* ── Sidebar ─────────────────────────────────────────────── */
+.menu__link {
+  font-size: 13px;
+  font-weight: 300;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.menu__link--active {
+  font-weight: 500;
+  background: linear-gradient(90deg, rgba(109,40,217,0.12), rgba(109,40,217,0.04));
+  border-left: 2px solid var(--ifm-color-primary);
+}
+
+/* ── TOC (right sidebar) ─────────────────────────────────── */
+.table-of-contents__link {
+  font-size: 12px;
+  font-weight: 300;
   color: var(--ifm-color-emphasis-600);
-  margin-top: 0.25rem;
 }
 
-/* Team cards */
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
+.table-of-contents__link--active {
+  font-weight: 500;
+  color: var(--ifm-color-primary);
 }
 
-.team-card {
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 12px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.team-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--ifm-color-primary), var(--ifm-color-primary-light));
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ── Content ─────────────────────────────────────────────── */
+.markdown h1 {
   font-size: 2rem;
-  margin: 0 auto 1rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
 }
 
-/* Pipeline steps */
-.pipeline-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border-left: 3px solid var(--ifm-color-primary);
-  background: var(--ifm-card-background-color);
+.markdown h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  margin-top: 2.5rem;
+}
+
+.markdown h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* Tables */
+.markdown table {
+  font-size: 13px;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  width: 100%;
+}
+
+.markdown thead tr {
+  background: linear-gradient(90deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary-dark));
+  color: #fff;
+}
+
+.markdown thead th {
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border: none;
+}
+
+.markdown tbody tr:nth-child(even) {
+  background: rgba(109, 40, 217, 0.03);
+}
+
+.markdown tbody td {
+  padding: 9px 14px;
+  border: none;
+  border-bottom: 1px solid var(--ifm-color-emphasis-100);
+  font-size: 13px;
+}
+
+/* Code blocks */
+.theme-code-block {
+  border-radius: 10px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+  border: 1px solid rgba(109,40,217,0.1) !important;
+}
+
+/* Blockquotes */
+.markdown blockquote {
+  border-left: 3px solid var(--ifm-color-primary-light);
+  background: linear-gradient(90deg, rgba(109,40,217,0.05), transparent);
   border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1.25rem;
+  font-style: normal;
+  color: var(--ifm-color-emphasis-700);
 }
 
-.step-number {
-  background: var(--ifm-color-primary);
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  flex-shrink: 0;
+/* Admonitions */
+.alert {
+  border-radius: 10px;
+  border-width: 0;
+  border-left-width: 3px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f0f1a 100%);
+}
+
+/* Pagination */
+.pagination-nav__link {
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary-light);
+  box-shadow: 0 2px 12px rgba(109,40,217,0.12);
 }

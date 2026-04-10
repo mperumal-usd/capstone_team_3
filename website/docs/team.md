@@ -4,13 +4,9 @@ title: Team
 sidebar_label: Team
 ---
 
-<div style={{display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem'}}>
-  <img src="/capstone_team_3/img/logo-usd.png" alt="University of San Diego" style={{height: '60px', objectFit: 'contain'}} />
-  <div>
-    <h1 style={{margin: 0}}>Team 3</h1>
-    <p style={{margin: 0, color: 'var(--ifm-color-emphasis-600)'}}>AAI-590 Applied AI Capstone — University of San Diego — Spring 2026</p>
-  </div>
-</div>
+# Team 3
+
+**AAI-590 Applied AI Capstone — University of San Diego — Spring 2026**
 
 ---
 
