@@ -27,7 +27,7 @@ flowchart LR
 
 ## Stage 1 — Dataset Collection
 
-590 classical piano MIDI files spanning ~30 composers.
+295 classical piano MIDI files spanning ~30 composers.
 
 ```mermaid
 pie title MIDI File Count by Composer (295 files)
