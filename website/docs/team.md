@@ -28,8 +28,6 @@ sidebar_label: Team
 
 ### Israel Romero
 
-**Role:** Data Pipeline · Feature Engineering · Project Timeline
-
 - GitHub: [@isralennon](https://github.com/isralennon)
 - University of San Diego, Applied AI Program
 
@@ -48,7 +46,7 @@ This project is the culminating work for **AAI-590: Applied AI Capstone** at the
 - **m-a-p** (Music and Audio Processing lab) for releasing [MERT-v1-95M](https://huggingface.co/m-a-p/MERT-v1-95M) as an open pre-trained model
 - **Meta FAISS team** for the [FAISS](https://github.com/facebookresearch/faiss) library enabling fast vector search
 - **HuggingFace** for the `transformers` and `peft` libraries used for LoRA fine-tuning
-- The creators of the 590-piece classical MIDI dataset used as the primary corpus
+- The creators of the 295-piece classical MIDI dataset used as the primary corpus
 
 ---
 

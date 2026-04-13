@@ -22,7 +22,7 @@ sidebar_label: Project Overview
 
 ## What Is This Project?
 
-**Melody Match** is a deep-learning system that identifies whether two pieces of classical music are similar — even across different tempos, keys, and recordings. Given an audio query, the system retrieves the most similar pieces from a 590-song classical catalogue using semantic embeddings, not rule-based matching.
+**Melody Match** is a deep-learning system that identifies whether two pieces of classical music are similar — even across different tempos, keys, and recordings. Given an audio query, the system retrieves the most similar pieces from a 295-song classical catalogue using semantic embeddings, not rule-based matching.
 
 The core idea is to fine-tune **MERT** (Music Encoder Representations from Transformers), a 95M-parameter audio foundation model, to produce embeddings that cluster music by composer and melody, then index those embeddings with **FAISS** for fast nearest-neighbour retrieval.
 
@@ -59,7 +59,7 @@ graph LR
 
 ```mermaid
 flowchart TB
-    Start(["🎼 590 Classical MIDI Files"])
+    Start(["🎼 295 Classical MIDI Files"])
 
     subgraph Preprocessing["Preprocessing"]
         direction LR
@@ -173,15 +173,18 @@ mindmap
 capstone_team_3/
 ├── notebooks/
 │   ├── COLAB_MERT_Finetune_v5.ipynb    ← Final model (primary)
-│   ├── COLAB_MERT_FAISS_Recall_Eval.ipynb
 │   ├── COLAB_CNN_MEL_Similarity.ipynb
 │   ├── LSTM_Model_v1.ipynb
-│   ├── GRU_Model_v1.ipynb
 │   ├── SiameseCNN_Model_v1.ipynb
-│   ├── Transformer_Model_v1.ipynb
-│   └── ResultsAnalysis.ipynb
+│   ├── DataExploration.ipynb
+│   ├── FeatureEngineering.ipynb
+│   ├── triplet_dataset_040326.ipynb
+│   ├── mert_evaluation.ipynb
+│   ├── Similarity_Score_EDA.ipynb
+│   ├── COLAB_Piano_Roll_test.ipynb
+│   └── archive/                        ← Older iterations (v1–v4, GRU, Transformer, etc.)
 ├── MidiDatasets/
-│   ├── 590-Classical-music-midi/
+│   ├── 590-Classical-music-midi/       ← 295 MIDI files
 │   └── TestingSamples/
 ├── FrontEnd/
 │   ├── MidiAnalyzer.html

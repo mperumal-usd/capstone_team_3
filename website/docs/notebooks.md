@@ -43,20 +43,6 @@ The definitive fine-tuning notebook. Trains `m-a-p/MERT-v1-95M` with LoRA adapte
 
 ---
 
-## Evaluation
-
-### MERT FAISS Recall Evaluation
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mperumal-usd/capstone_team_3/blob/main/notebooks/COLAB_MERT_FAISS_Recall_Eval.ipynb)
-
-**`notebooks/COLAB_MERT_FAISS_Recall_Eval.ipynb`**
-
-Standalone evaluation notebook. Loads multiple saved LoRA checkpoints (v3, v4, ...), builds per-checkpoint FAISS indexes from the gallery, queries with external WAV chunks, and computes a side-by-side Recall@K comparison table.
-
-Features resume-safe embedding generation — safe to re-run after Google Colab disconnects.
-
----
-
 ## Alternative Models
 
 ### CNN + Mel Spectrogram Similarity
@@ -77,14 +63,6 @@ Sequence-to-label LSTM trained on MIDI token representations. Tests 210,167 (lab
 
 ---
 
-### GRU Model
-
-**`notebooks/GRU_Model_v1.ipynb`**
-
-Gated Recurrent Unit baseline — faster convergence than LSTM with comparable accuracy on the validation set.
-
----
-
 ### Siamese CNN
 
 **`notebooks/SiameseCNN_Model_v1.ipynb`**
@@ -93,29 +71,13 @@ Twin-network CNN with contrastive loss. Takes two audio segments and directly pr
 
 ---
 
-### Transformer (from scratch)
-
-**`notebooks/Transformer_Model_v1.ipynb`**
-
-Custom encoder-only transformer trained from scratch on MIDI tokens. Demonstrates the importance of music-specific pre-training — significantly underperforms MERT.
-
----
-
-## Data Preparation
+## Data & Analysis
 
 ### Data Exploration
 
-**`notebooks/DataExploration.ipynb`** · **`notebooks/DataExploration_v1.ipynb`**
+**`notebooks/DataExploration.ipynb`**
 
 Initial exploratory data analysis of the MIDI dataset — note density, tempo distributions, duration histograms, composer statistics.
-
----
-
-### Data Cleaning
-
-**`notebooks/DataCleaning.ipynb`**
-
-Identifies and removes corrupt MIDI files, deduplicates near-identical arrangements, and produces the final clean 590-file corpus.
 
 ---
 
@@ -135,24 +97,6 @@ Generates the anchor/positive/negative triplet CSV from the chunk directory stru
 
 ---
 
-### Embeddings Generation
-
-**`notebooks/Embeddings_Generation.ipynb`**
-
-Batch-extracts and caches embeddings from a fine-tuned MERT checkpoint.
-
----
-
-## Analysis
-
-### Results Analysis
-
-**`notebooks/ResultsAnalysis.ipynb`**
-
-Aggregates predictions from LSTM, GRU, and Transformer models across 210,167 test pairs. Computes accuracy, confusion matrices, and per-song error breakdowns.
-
----
-
 ### MERT Evaluation
 
 **`notebooks/mert_evaluation.ipynb`** · **`notebooks/mert_finetuned.ipynb`**
@@ -163,7 +107,7 @@ Ad-hoc evaluation notebooks used during development to inspect embedding quality
 
 ### Similarity Score EDA
 
-**`notebooks/Similarity_Score_EDA.ipynb`** · **`notebooks/Similarity_Score_EDA-MERT.ipynb`**
+**`notebooks/Similarity_Score_EDA.ipynb`** · **`notebooks/COLAB_Similarity_Score_EDA_MERT.ipynb`**
 
 Exploratory analysis of cosine similarity score distributions — understanding the gap between same-song and cross-song pairs before and after fine-tuning.
 
@@ -174,3 +118,24 @@ Exploratory analysis of cosine similarity score distributions — understanding 
 **`notebooks/COLAB_Piano_Roll_test.ipynb`**
 
 Interactive MIDI piano roll rendering for visual inspection of melodic content and alignment.
+
+---
+
+## Archive
+
+Older iterations moved to `notebooks/archive/`. These are preserved for reference but superseded by the notebooks above.
+
+| Notebook | Description |
+|----------|-------------|
+| `archive/COLAB_MERT_Finetune_v1.ipynb` | Initial LoRA setup |
+| `archive/COLAB_MERT_Finetune_v2.ipynb` | Updated data loading |
+| `archive/COLAB_MERT_Finetune_v3.ipynb` | Added FAISS validation section |
+| `archive/COLAB_MERT_Finetune_v4.ipynb` | Optimizer tuning |
+| `archive/COLAB_MERT_FAISS_Recall_Eval.ipynb` | Multi-checkpoint Recall@K comparison |
+| `archive/GRU_Model_v1.ipynb` | GRU baseline model |
+| `archive/Transformer_Model_v1.ipynb` | Custom transformer (trained from scratch) |
+| `archive/DataCleaning.ipynb` | Corpus cleaning and deduplication |
+| `archive/DataExploration_v1.ipynb` | Earlier EDA iteration |
+| `archive/Embeddings_Generation.ipynb` | Batch embedding extraction |
+| `archive/ResultsAnalysis.ipynb` | LSTM/GRU/Transformer prediction analysis |
+| `archive/Similarity_Score_EDA-MERT.ipynb` | Similarity EDA (earlier MERT version) |

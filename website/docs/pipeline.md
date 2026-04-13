@@ -10,7 +10,7 @@ The pipeline transforms raw MIDI files into a searchable embedding index through
 
 ```mermaid
 flowchart LR
-    A(["🎼 590 MIDI Files"]) --> B["FluidSynth\nMIDI → WAV"]
+    A(["🎼 295 MIDI Files"]) --> B["FluidSynth\nMIDI → WAV"]
     B --> C["Resample\n24 kHz mono"]
     C --> D["7-sec Chunks\n43,663 total"]
     D --> E["MERT Encoder\n768-dim"]
