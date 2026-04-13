@@ -5,6 +5,13 @@
 
 ---
 
+## Documentation
+
+Full project documentation is available at:
+**[https://mperumal-usd.github.io/capstone_team_3/](https://mperumal-usd.github.io/capstone_team_3/)**
+
+---
+
 ## Overview
 
 **Melody Match** is a deep-learning system for classical music similarity search. Given an audio query, it retrieves the most similar pieces from a 590-song corpus using semantic embeddings — not rule-based matching.
@@ -189,12 +196,6 @@ pip install transformers peft accelerate librosa numpy pandas scikit-learn tqdm 
 | Pre-trained on music | — | — | ✗ | ✓ |
 | Scalable retrieval (FAISS) | ✓ | ✗ | ✓ | ✓ |
 
----
-
-## Documentation
-
-Full project documentation is available at:
-**[https://mperumal-usd.github.io/capstone_team_3/](https://mperumal-usd.github.io/capstone_team_3/)**
 
 ---
 
