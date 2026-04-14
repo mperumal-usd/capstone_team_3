@@ -11,9 +11,9 @@ Full project documentation is available at:
 **[https://mperumal-usd.github.io/capstone_team_3/](https://mperumal-usd.github.io/capstone_team_3/)**
 
 ---
-## Demo
+## Video Presentation
 
-Demo video is avaialble at:
+Presentation video is avaialble at:
   [![Melody Match Demo](https://img.youtube.com/vi/D2opYEuRxb4/maxresdefault.jpg)](https://youtu.be/D2opYEuRxb4)                                                                      
                                                                                                                     
 
