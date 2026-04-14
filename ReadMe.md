@@ -14,7 +14,7 @@ Full project documentation is available at:
 
 ## Overview
 
-**Melody Match** is a deep-learning system for classical music similarity search. Given an audio query, it retrieves the most similar pieces from a 590-song corpus using semantic embeddings — not rule-based matching.
+**Melody Match** is a deep-learning system for classical music similarity search. Given an audio query, it retrieves the most similar pieces from a classical song corpus using semantic embeddings — not rule-based matching.
 
 The system fine-tunes **MERT** (Music Encoder Representations from Transformers, `m-a-p/MERT-v1-95M`), a 95M-parameter audio foundation model pre-trained on large-scale music data. Fine-tuning uses LoRA adapters and a TripletMarginLoss objective. Embeddings are indexed with **FAISS** for fast nearest-neighbour retrieval.
 
@@ -157,7 +157,7 @@ Replaces mean-pooling with multi-scale temporal aggregation. Three parallel `Con
 
 ## Dataset
 
-- **590 classical MIDI files** covering ~30 composers (Bach, Beethoven, Chopin, Liszt, Mozart, Schubert, …)
+- ** classical MIDI files** covering ~30 composers (Bach, Beethoven, Chopin, Liszt, Mozart, Schubert, …)
 - Synthesised to WAV using FluidSynth + FluidR3 GM soundfont, resampled to 24 kHz
 - Split into **7-second non-overlapping chunks** → 43,663 gallery chunks
 - **23,183 triplets** generated for fine-tuning (80/20 train/val split, stratified by composer)
