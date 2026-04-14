@@ -28,6 +28,20 @@ The core idea is to fine-tune **MERT** (Music Encoder Representations from Trans
 
 ---
 
+## Presentation Video
+
+<div style={{position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '12px', marginBottom: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.15)'}}>
+  <iframe
+    src="https://www.youtube.com/embed/D2opYEuRxb4"
+    title="Melody Match Demo"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none'}}
+  />
+</div>
+
+---
+
 ## Motivation
 
 Traditional music similarity methods fail to capture **musical meaning**:
