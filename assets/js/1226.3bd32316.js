@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmelody_match_docs=self.webpackChunkmelody_match_docs||[]).push([[1226],{1226:(e,c,s)=>{s.d(c,{createInfoServices:()=>a.v});var a=s(3954);s(2519)}}]);

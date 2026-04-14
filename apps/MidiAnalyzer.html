@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Player & Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .upload-section {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px dashed #667eea;
+        }
+
+        .upload-section input[type="file"] {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .info-card p {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .note-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .velocity-bar {
+            display: inline-block;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+
+        .track-section {
+            margin-top: 30px;
+        }
+
+        .track-header {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 MIDI Player & Analyzer</h1>
+            <p>Upload, play, and analyze MIDI files with detailed information</p>
+        </div>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <input type="file" id="midiFile" accept=".mid,.midi" />
+                <label for="midiFile" class="upload-btn">📁 Choose MIDI File</label>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+
+            <!-- Player Controls -->
+            <div id="playerSection" style="display: none;">
+                <div class="controls">
+                    <button class="control-btn" id="playBtn">▶️ Play</button>
+                    <button class="control-btn" id="pauseBtn">⏸️ Pause</button>
+                    <button class="control-btn" id="stopBtn">⏹️ Stop</button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+                    </div>
+                </div>
+
+                <!-- MIDI Information -->
+                <h2 class="section-title">📊 MIDI Information</h2>
+                <div class="info-grid" id="midiInfo"></div>
+
+                <!-- Notes Table -->
+                <h2 class="section-title">🎼 Notes & Melody</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Time (s)</th>
+                                <th>Note</th>
+                                <th>Pitch (MIDI)</th>
+                                <th>Octave</th>
+                                <th>Duration (s)</th>
+                                <th>Velocity</th>
+                                <th>Track</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let midi = null;
+        let synth = null;
+        let currentPart = null;
+        let isPlaying = false;
+        let startTime = 0;
+        let pauseTime = 0;
+        let animationId = null;
+
+        const midiFileInput = document.getElementById('midiFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const playerSection = document.getElementById('playerSection');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const midiInfoEl = document.getElementById('midiInfo');
+        const notesTableEl = document.getElementById('notesTable');
+
+        // Initialize Tone.js synth
+        synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: {
+                attack: 0.005,
+                decay: 0.1,
+                sustain: 0.3,
+                release: 1
+            }
+        }).toDestination();
+
+        // File upload handler
+        midiFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            fileInfo.innerHTML = `<div class="loading"><div class="spinner"></div>Loading ${file.name}...</div>`;
+            playerSection.style.display = 'none';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                midi = new Midi(arrayBuffer);
+
+                fileInfo.textContent = `✓ Loaded: ${file.name}`;
+                displayMIDIInfo();
+                displayNotes();
+                playerSection.style.display = 'block';
+                setupPlayer();
+
+            } catch (error) {
+                fileInfo.innerHTML = `<div class="error-message">❌ Error loading MIDI file: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        });
+
+        function displayMIDIInfo() {
+            const totalNotes = midi.tracks.reduce((sum, track) => {
+                return sum + (track.notes ? track.notes.length : 0);
+            }, 0);
+
+            const pitches = new Set();
+
+            midi.tracks.forEach(track => {
+                if (track.notes) {
+                    track.notes.forEach(note => {
+                        if (note.midi !== undefined) {
+                            pitches.add(note.midi);
+                        }
+                    });
+                }
+            });
+
+            const duration = midi.duration || 0;
+            const tempo = midi.header?.tempos?.[0]?.bpm || 120;
+            const timeSignature = midi.header?.timeSignatures?.[0]?.timeSignature?.join('/') || '4/4';
+            const ppq = midi.header?.ppq || 480;
+
+            let pitchRangeHTML = '-';
+            if (pitches.size > 0) {
+                const minPitch = Math.min(...pitches);
+                const maxPitch = Math.max(...pitches);
+                pitchRangeHTML = `${midiToNoteName(minPitch)} - ${midiToNoteName(maxPitch)}`;
+            }
+
+            const infoHTML = `
+                <div class="info-card">
+                    <h3>Duration</h3>
+                    <p>${formatTime(duration)}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Total Notes</h3>
+                    <p>${totalNotes.toLocaleString()}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Tracks</h3>
+                    <p>${midi.tracks.length}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Tempo (BPM)</h3>
+                    <p>${Math.round(tempo)}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Time Signature</h3>
+                    <p>${timeSignature}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Unique Pitches</h3>
+                    <p>${pitches.size}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Pitch Range</h3>
+                    <p>${pitchRangeHTML}</p>
+                </div>
+                <div class="info-card">
+                    <h3>PPQ (Ticks)</h3>
+                    <p>${ppq}</p>
+                </div>
+            `;
+
+            midiInfoEl.innerHTML = infoHTML;
+            totalTimeEl.textContent = formatTime(duration);
+        }
+
+        function displayNotes() {
+            const allNotes = [];
+
+            midi.tracks.forEach((track, trackIndex) => {
+                if (track.notes && track.notes.length > 0) {
+                    track.notes.forEach(note => {
+                        allNotes.push({
+                            ...note,
+                            trackIndex,
+                            trackName: track.name || `Track ${trackIndex + 1}`
+                        });
+                    });
+                }
+            });
+
+            // Sort by time
+            allNotes.sort((a, b) => (a.time || 0) - (b.time || 0));
+
+            // Display first 500 notes (for performance)
+            const displayNotes = allNotes.slice(0, 500);
+
+            const rowsHTML = displayNotes.map((note, index) => {
+                const time = note.time !== undefined ? note.time.toFixed(3) : '0.000';
+                const duration = note.duration !== undefined ? note.duration.toFixed(3) : '0.000';
+                const velocity = note.velocity !== undefined ? note.velocity : 0.8;
+                const velocityValue = Math.round(velocity * 127);
+                const velocityWidth = (velocity * 100);
+                const noteName = note.name || midiToNoteName(note.midi || 60);
+                const midiNum = note.midi !== undefined ? note.midi : '-';
+                const octave = note.octave !== undefined ? note.octave : '-';
+
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${time}</td>
+                        <td class="note-name">${noteName}</td>
+                        <td>${midiNum}</td>
+                        <td>${octave}</td>
+                        <td>${duration}</td>
+                        <td>
+                            ${velocityValue}
+                            <span class="velocity-bar" style="width: ${velocityWidth}px;"></span>
+                        </td>
+                        <td>${note.trackName || 'Unknown'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            notesTableEl.innerHTML = rowsHTML;
+
+            if (allNotes.length > 500) {
+                notesTableEl.innerHTML += `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #667eea; font-style: italic; padding: 20px;">
+                            Showing first 500 of ${allNotes.length.toLocaleString()} total notes
+                        </td>
+                    </tr>
+                `;
+            }
+
+            if (allNotes.length === 0) {
+                notesTableEl.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #999; padding: 40px;">
+                            No notes found in this MIDI file
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function setupPlayer() {
+            // Clear previous part if exists
+            if (currentPart) {
+                currentPart.dispose();
+            }
+
+            // Create events for all notes
+            const events = [];
+            midi.tracks.forEach(track => {
+                if (track.notes) {
+                    track.notes.forEach(note => {
+                        if (note.time !== undefined && note.name && note.duration !== undefined) {
+                            events.push({
+                                time: note.time,
+                                note: note.name,
+                                duration: note.duration,
+                                velocity: note.velocity !== undefined ? note.velocity : 0.8
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Sort by time
+            events.sort((a, b) => a.time - b.time);
+
+            // Create Tone.Part
+            if (events.length > 0) {
+                currentPart = new Tone.Part((time, event) => {
+                    synth.triggerAttackRelease(
+                        event.note,
+                        event.duration,
+                        time,
+                        event.velocity
+                    );
+                }, events);
+
+                currentPart.loop = false;
+            }
+        }
+
+        playBtn.addEventListener('click', async () => {
+            await Tone.start();
+
+            if (Tone.Transport.state === 'paused') {
+                Tone.Transport.start();
+            } else {
+                Tone.Transport.start();
+                currentPart.start(0);
+            }
+
+            isPlaying = true;
+            startTime = Tone.now() - pauseTime;
+            updateProgress();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            Tone.Transport.pause();
+            isPlaying = false;
+            pauseTime = Tone.Transport.seconds;
+            cancelAnimationFrame(animationId);
+        });
+
+        stopBtn.addEventListener('click', () => {
+            Tone.Transport.stop();
+            currentPart.stop();
+            isPlaying = false;
+            pauseTime = 0;
+            progressFill.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+            cancelAnimationFrame(animationId);
+        });
+
+        function updateProgress() {
+            if (!isPlaying) return;
+
+            const currentSeconds = Tone.Transport.seconds;
+            const progress = (currentSeconds / midi.duration) * 100;
+
+            progressFill.style.width = `${Math.min(progress, 100)}%`;
+            currentTimeEl.textContent = formatTime(currentSeconds);
+
+            if (currentSeconds >= midi.duration) {
+                isPlaying = false;
+                stopBtn.click();
+            } else {
+                animationId = requestAnimationFrame(updateProgress);
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function midiToNoteName(midi) {
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const octave = Math.floor(midi / 12) - 1;
+            const noteName = noteNames[midi % 12];
+            return `${noteName}${octave}`;
+        }
+    </script>
+</body>
+</html>
