@@ -10,7 +10,7 @@
 Full project documentation is available at:
 **[https://mperumal-usd.github.io/capstone_team_3/](https://mperumal-usd.github.io/capstone_team_3/)**
 
-Live Demo From Audio Recording (USD Account access only):
+Live Demo Video From Audio Recording (USD Account access only):
 <br>https://uofsandiego-my.sharepoint.com/:v:/g/personal/dverduzco_sandiego_edu/IQCEplEOV1hNS4yEFGIsXvE_AXKZkItYg1v6VPnfldbsyqg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=S0zQH6 
 
 ---
