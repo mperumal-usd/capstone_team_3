@@ -18,7 +18,7 @@ Full project documentation is available at:
 Presentation video is avaialble at:
   [![Melody Match Demo](https://img.youtube.com/vi/D2opYEuRxb4/maxresdefault.jpg)](https://youtu.be/D2opYEuRxb4)              
 
-## Live Demo Video (USD Account access only):
+## Live Demo Video (USD Account Access Only):
 "Fine_tuned_model_demo.ipynb"
 <br>https://uofsandiego-my.sharepoint.com/:v:/g/personal/dverduzco_sandiego_edu/IQCEplEOV1hNS4yEFGIsXvE_AXKZkItYg1v6VPnfldbsyqg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=S0zQH6 
                                                                                                                     
